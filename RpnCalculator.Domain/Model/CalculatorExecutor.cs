@@ -9,33 +9,26 @@ namespace RpnCalculator.Domain.Model
 {
     public class CalculatorExecutor : ICalculatorExecutor
     {
+        private readonly Dictionary<string, Func<double, double, double>> Operations = new()
+        {
+            {"+", (x, y) => { return x + y; } },
+            {"-", (x, y) => { return x - y; } },
+            {"*", (x, y) => { return x * y; } },
+            {"/", (x, y) => { return x / y; } }
+        };
         public void ApplyOperator(ICalculatorContainer container, string op)
         {
             if (container.Count() < 2)
             {
                 throw new InvalidOperationException("The stack must have at least two items to apply an operator");
             }
+            if (!Operations.ContainsKey(op))
+            {
+                throw new InvalidOperationException($"The symbol '{op}' is not recognised as a valid operator. Accepted operators are: (+, -, *, /)");
+            }
             var firstItem = container.PopItem();
             var secondItem = container.PopItem();
-            double newItem = 0;
-            switch (op)
-            {
-                case "+":
-                    newItem = firstItem + secondItem;
-                    break;
-                case "-":
-                    newItem = firstItem - secondItem;
-                    break;
-                case "*":
-                    newItem = firstItem * secondItem;
-                    break;
-                case "/":
-                    newItem = firstItem / secondItem;
-                    break;
-                default:
-                    throw new InvalidOperationException($"The symbol '{op}' is not recognised as a valid operator. Accepted operators are: (+, -, *, /)");
-
-            }
+            double newItem = Operations[op](secondItem, firstItem);            
             container.PushItem(newItem);
         }
     }

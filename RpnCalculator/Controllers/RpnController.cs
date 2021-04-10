@@ -23,15 +23,17 @@ namespace RpnCalculator.Controllers
             CalculatorService = calculatorService;
         }
 
-
-
         [Route("PushItem")]
         [HttpPost]
-        public void Push(double operand)
+        public void Push(string operand)
         {
-            CalculatorService.Push(operand);
+            double x;
+            if (!Double.TryParse(operand, out x))
+            {
+               throw new ArgumentException("Operand should be a double");
+            }
+            CalculatorService.Push(x);
         }
-
 
         [Route("PushOperator")]
         [HttpPost]
@@ -46,7 +48,6 @@ namespace RpnCalculator.Controllers
         {
             return CalculatorService.GetStack();
         }
-
 
         [Route("CleanStack")]
         [HttpGet]
