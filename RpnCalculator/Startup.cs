@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using RpnCalculator.Errors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,8 @@ namespace RpnCalculator
 
         public IConfiguration Configuration { get; }
 
+        readonly string allowSpecificOrigins = "_allowSpecificOrigins";
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -33,6 +36,16 @@ namespace RpnCalculator
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "RpnCalculator", Version = "v1" });
             });
             services.AddControllers(options => options.Filters.Add(new HttpResponseExceptionFilter()));
+            services.AddCors(options =>
+            {
+                options.AddPolicy(allowSpecificOrigins,
+                builder =>
+                {
+                    builder.WithOrigins("https://localhost:44300")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,6 +59,8 @@ namespace RpnCalculator
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors(allowSpecificOrigins);
 
             app.UseRouting();
 
