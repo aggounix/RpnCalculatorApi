@@ -32,6 +32,7 @@ namespace RpnCalculator
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "RpnCalculator", Version = "v1" });
             });
+            services.AddControllers(options => options.Filters.Add(new HttpResponseExceptionFilter()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
